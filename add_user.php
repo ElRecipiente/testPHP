@@ -28,7 +28,8 @@ if (isset($_POST["favouriteBook"]) && $_POST["favouriteBook"] != 0) {
     $favouriteBook = $_POST["favouriteBook"];
     echo "favouriteBook recup OK<br>";
 } else {
-    echo "FB IS NOT OK<br>";
+    $favouriteBook = null;
+    echo "L'utilisateur n'aime pas les livres.<br>";
 }
 //
 $host = 'localhost';

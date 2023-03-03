@@ -63,7 +63,7 @@
                     $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     //
                     foreach ($resultats as $users) {
-                        echo "<option value=''>Choose a book here</option>";
+                        echo "<option value='{$users['id']}'>{$users['title']}</option>";
                     }
                 } catch (PDOException $e) {
                     echo "Erreur : " . $e->getMessage();
