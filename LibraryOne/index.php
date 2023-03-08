@@ -23,20 +23,17 @@ if (TRUE === isset($_POST['login'])) {
 		// Le code est correct, on peut continuer
 		// On recupere le mail de l'utilisateur saisi dans le formulaire
 		$mail = $_POST['emailid'];
-		// On recupere le mot de passe saisi par l'utilisateur et on le crypte (fonction md5)
-		$password = md5($_POST['password']);
 		// On construit la requete SQL pour recuperer l'id, le readerId et l'email du lecteur � partir des deux variables ci-dessus
 		// dans la table tblreaders
-		$sql = "SELECT EmailId, Password, ReaderId, Status FROM tblreaders  WHERE EmailId = :email AND Password = :password";
+		$sql = "SELECT EmailId, Password, ReaderId, Status FROM tblreaders  WHERE EmailId = :email";
 		$query = $dbh->prepare($sql);
 		$query->bindParam(':email', $mail, PDO::PARAM_STR);
-		$query->bindParam(':password', $password, PDO::PARAM_STR);
 		// On execute la requete
 		$query->execute();
 		// On stocke le resultat de recherche dans une variable $result
 		$result = $query->fetch(PDO::FETCH_OBJ);
 
-		if (!empty($result)) {
+		if (!empty($result) && password_verify($_POST['password'], $result->Password)) {
 			// Si le resultat de recherche n'est pas vide
 			// On stocke l'identifiant du lecteur (ReaderId) dans $_SESSION['rdid']
 			$_SESSION['rdid'] = $result->ReaderId;
@@ -77,6 +74,7 @@ if (TRUE === isset($_POST['login'])) {
 	<?php include('includes/header.php'); ?>
 
 	<!-- On insere le titre de la page (LOGIN UTILISATEUR) -->
+	<!--On insere le formulaire de login-->
 	<div class="container">
 		<div class="row">
 			<div class="col">
@@ -109,10 +107,6 @@ if (TRUE === isset($_POST['login'])) {
 			</div>
 		</div>
 	</div>
-
-
-	<!--On insere le formulaire de login-->
-
 
 	<!--A la suite de la zone de saisie du captcha, on insere l'image cree par captcha.php : <img src="captcha.php">  -->
 

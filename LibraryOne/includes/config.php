@@ -15,3 +15,4 @@ catch (PDOException $e)
 	// Echec de la connexion
     exit("Error: " . $e->getMessage());
 }
+?>

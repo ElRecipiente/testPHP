@@ -43,6 +43,21 @@ try {
     $sql = "INSERT INTO users (name, email, country, favouriteBook) VALUES (:name, :email, :country, :favouriteBook)";
     $stmt = $db->prepare($sql);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     //bind values
     $stmt->bindParam(":name", $name);
     $stmt->bindParam(":email", $email);
