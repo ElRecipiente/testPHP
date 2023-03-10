@@ -157,6 +157,7 @@ if (!empty($_POST['vercode']) && $_POST['vercode'] != $_SESSION['vercode']) {
                     <div class="form-group">
                         <input type="submit" value="Envoyer" id="button">
                     </div>
+                </form>
             </div>
         </div>
     </div>

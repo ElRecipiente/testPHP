@@ -10,7 +10,7 @@ include('includes/config.php');
 if (!empty($_POST['vercode']) && $_POST['vercode'] != $_SESSION['vercode']) {
      // Le code est incorrect on informe l'utilisateur par une fenetre pop_up
      echo "<script>alert('CAPTCHA incorrect')</script>";
-} else if (!empty($_POST['password']) || $_POST['password'] != $_POST['passwordverif']) {
+} else if (!empty($_POST['password']) && $_POST['password'] != $_POST['passwordverif']) {
      echo "<script>alert('Les mots de passe ne sont pas identiques')</script>";
 } else {
 
@@ -20,28 +20,44 @@ if (!empty($_POST['vercode']) && $_POST['vercode'] != $_SESSION['vercode']) {
 
      if (!empty($_POST["mobilenumber"])) {
           $mobilenumber = $_POST["mobilenumber"];
+     } else {
+          $mobilenumber = "default@default.com";
      }
 
      if (!empty($_POST["emailid"])) {
           $emailid = $_POST["emailid"];
+     } else {
+          $emailid = "0XXXXXXXXX";
      }
 
-     if (!empty($_POST["password"])) {
-          $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-     }
      // On cherche en base le lecteur avec cet email et ce numero de tel dans la table tblreaders
-
-     // Si le resultat de recherche n'est pas vide
-     // On met a jour la table tblreaders avec le nouveau mot de passe
-     // On informa l'utilisateur par une fenetre popup de la reussite ou de l'echec de l'operation
-     // On prépare la requete d'insertion en base de données de toutes ces valeurs dans la table tblreaders
-     $sql = "INSERT INTO tblreaders (Password) VALUES (:password)";
+     $sql = "SELECT Emailid, MobileNumber FROM tblreaders";
      $stmt = $dbh->prepare($sql);
-
-     $stmt->bindParam(":password", $password);
-
-     // On éxecute la requete
      $stmt->execute();
+     $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+     foreach ($resultats as $resultat) {
+          if ($resultat["Emailid"] == $emailid && $resultat["MobileNumber"] == $mobilenumber) {
+               // Si le resultat de recherche n'est pas vide
+               // On met a jour la table tblreaders avec le nouveau mot de passe
+               // On informa l'utilisateur par une fenetre popup de la reussite ou de l'echec de l'operation
+               // On prépare la requete d'insertion en base de données de toutes ces valeurs dans la table tblreaders
+               if (!empty($_POST["password"]) && $_POST["password"] == $_POST["passwordverif"]) {
+
+                    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+
+                    $sql = "UPDATE tblreaders SET `password`=:password WHERE Emailid=:emailid";
+                    $stmt = $dbh->prepare($sql);
+
+                    $stmt->bindParam(":password", $password);
+                    $stmt->bindParam(":emailid", $emailid);
+
+                    // On éxecute la requete
+                    $stmt->execute();
+                    echo "<script>alert('Changement de mot de passe réussi !')</script>";
+               }
+          }
+     }
 }
 ?>
 
@@ -74,7 +90,6 @@ if (!empty($_POST['vercode']) && $_POST['vercode'] != $_SESSION['vercode']) {
           <div class="row">
                <div class="col">
                     <h3>RECUPERATION MOT DE PASSE</h3>
-                    <!--On affiche le formulaire de creation de compte-->
                     <form action="user-forgot-password.php" method="POST" onSubmit="return valid()">
                          <div class="form-group">
                               <label for="emailid">Entrez votre email</label>
@@ -99,6 +114,7 @@ if (!empty($_POST['vercode']) && $_POST['vercode'] != $_SESSION['vercode']) {
                          <div class="form-group">
                               <input type="submit" value="Envoyer" id="button">
                          </div>
+                    </form>
                </div>
           </div>
      </div>
