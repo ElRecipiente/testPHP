@@ -68,6 +68,10 @@ if (strlen($_SESSION['login']) == 0) {
             color: white;
             font-weight: bolder;
         }
+
+        .red {
+            color: red;
+        }
     </style>
     <!--On insere ici le menu de navigation T-->
     <?php include('includes/header.php'); ?>
@@ -89,7 +93,7 @@ if (strlen($_SESSION['login']) == 0) {
                 <?php
                 //on crée la requête SQL
                 //$sql = "SELECT * FROM tblreaders JOIN tblissuedbookdetails ON tblreaders.ReaderId = tblissuedbookdetails.ReaderID WHERE ReaderID = :rdid";
-                $sql = "SELECT * FROM tblissuedbookdetails WHERE ReaderID = :rdid";
+                $sql = "SELECT * FROM tblissuedbookdetails JOIN tblbooks ON tblissuedbookdetails.BookId = tblbooks.ISBNNumber WHERE ReaderID = :rdid";
                 //On la prépare dans un statement
                 $stmt = $dbh->prepare($sql);
                 $stmt->bindParam(":rdid", $rdid);
@@ -99,13 +103,19 @@ if (strlen($_SESSION['login']) == 0) {
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // var_dump($results);
+                $increment = 0;
 
                 foreach ($results as $book) {
-                    echo "<tr><td>{$book['id']}</td>";
-                    echo "<td>{$book['BookId']}</td>";
+                    $increment++;
+                    echo "<tr><td>{$increment}</td>";
+                    echo "<td>{$book['BookName']}</td>";
                     echo "<td>{$book['BookId']}</td>";
                     echo "<td>{$book['IssuesDate']}</td>";
-                    echo "<td>{$book['ReturnDate']}</td></tr>";
+                    if ($book['ReturnDate'] != NULL) {
+                        echo "<td>{$book['ReturnDate']}</td></tr>";
+                    } else {
+                        echo "<td><span class='red'>Non retourné</span></td></tr>";
+                    }
                 }
 
                 ?>

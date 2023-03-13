@@ -25,12 +25,12 @@ if (strlen($_SESSION['login']) == 0) {
      // On construit la requete qui permet de compter combien de livres sont associ�s � ce lecteur avec le ReturnStatus � 0 
 
      // On stocke le r�sultat dans une variable
-     $sql = "SELECT BookId, ReturnStatus FROM tblissuedbookdetails WHERE ReaderID = :readerid";
+     $sql = "SELECT * FROM tblissuedbookdetails WHERE ReaderID = :readerid";
      $stmt = $dbh->prepare($sql);
      $stmt->bindParam(':readerid', $rdid);
      $stmt->execute();
 
-     $result = $stmt->fetch(PDO::FETCH_OBJ);
+     $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 ?>
 
      <!DOCTYPE html>
@@ -85,8 +85,15 @@ if (strlen($_SESSION['login']) == 0) {
                <div><!-- Carte empruntés-->
                     <h4>Livres empruntés :</h4>
                     <br>
-                    <?php if (!empty($result->BookId)) {
-                         echo "<p>$result->BookId</p>";
+                    <?php
+                    $booktook = 0;
+                    foreach ($results as $result) {
+                         if (!empty($result->IssuesDate)) {
+                              $booktook++;
+                         }
+                    }
+                    if ($booktook != 0) {
+                         echo "<p>$booktook</p>";
                     } else {
                          echo "<p>Aucun</p>";
                     } ?>
@@ -95,8 +102,15 @@ if (strlen($_SESSION['login']) == 0) {
                <!-- On affiche la carte des livres non rendus le lecteur-->
                <div><!-- Carte non rendus-->
                     <h4>Livres non rendus :</h4>
-                    <?php if (!empty($result->ReturnStatus)) {
-                         echo "<p>$result->ReturnStatus</p>";
+                    <?php
+                    $bookback = 0;
+                    foreach ($results as $result) {
+                         if (!empty($result->ReturnStatus)) {
+                              $bookback++;
+                         }
+                    }
+                    if ($bookback != 0) {
+                         echo "<p>$bookback</p>";
                     } else {
                          echo "<p>Aucun</p>";
                     } ?>
